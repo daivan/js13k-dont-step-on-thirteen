@@ -1,23 +1,24 @@
-import { initInput, onInput, initPointer, track, init, Sprite, GameLoop, getPointer, keyPressed } from 'kontra';
-import { zzfx } from 'zzfx';
+import { init, GameLoop } from 'kontra';
 
-import GameState from './GameState';
+import PlayerActor from './Player';
+import GameArea from './GameArea';
 
 let { canvas, context } = init();
 
-let gameState = new GameState(0);
 
-gameState.reset();
+let gameArea = new GameArea()
+let playerActor = new PlayerActor()
 
-initPointer();
-initInput();
+
+
 
 let loop = GameLoop({  // create the main game loop
   update: function (dt) { // update the game state
-    gameState.update(dt);
+    playerActor.update(dt)
   },
   render: function () { // render the game state
-    gameState.render();
+    gameArea.render();
+    playerActor.render();
   }
 });
 

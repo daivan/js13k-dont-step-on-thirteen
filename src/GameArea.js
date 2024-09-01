@@ -169,11 +169,11 @@ export default class GameArea {
 
  
 
-  update(dt, gameState) {
+  update(dt) {
 
   }
 
-  render(gameState) {
+  render() {
     this.background.render();
 
     this.scoreText.render();
