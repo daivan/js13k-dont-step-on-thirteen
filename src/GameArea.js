@@ -8,7 +8,7 @@ export default class GameArea {
   numberOfColumns = 8;
 
 
-  scoreText = new Text({
+  columnText = new Text({
     text: '7',
     font: '20px Arial',
     color: 'black',
@@ -17,7 +17,7 @@ export default class GameArea {
 
   });
 
-  scoreText2 = new Text({
+  columnText2 = new Text({
     text: '6',
     font: '20px Arial',
     color: 'black',
@@ -26,7 +26,7 @@ export default class GameArea {
 
   });
 
-  scoreText3 = new Text({
+  columnText3 = new Text({
     text: '2',
     font: '20px Arial',
     color: 'black',
@@ -34,7 +34,7 @@ export default class GameArea {
     y: 0,
 
   });
-  scoreText4 = new Text({
+  columnText4 = new Text({
     text: '4',
     font: '20px Arial',
     color: 'black',
@@ -42,7 +42,7 @@ export default class GameArea {
     y: 0,
 
   });
-  scoreText5 = new Text({
+  columnText5 = new Text({
     text: '6',
     font: '20px Arial',
     color: 'black',
@@ -50,14 +50,14 @@ export default class GameArea {
     y: 0,
 
   });
-  scoreText6 = new Text({
+  columnText6 = new Text({
     text: '4',
     font: '20px Arial',
     color: 'black',
     x: 320,
     y: 0,
   });
-  scoreText7 = new Text({
+  columnText7 = new Text({
     text: '10',
     font: '20px Arial',
     color: 'black',
@@ -66,7 +66,7 @@ export default class GameArea {
 
   });
 
-  scoreText8 = new Text({
+  columnText8 = new Text({
     text: '3',
     font: '20px Arial',
     color: 'black',
@@ -75,7 +75,7 @@ export default class GameArea {
 
   });
 
-  rightText1 = new Text({
+  rowText1 = new Text({
     text: '5',
     font: '20px Arial',
     color: 'black',
@@ -83,7 +83,7 @@ export default class GameArea {
     y: 40,
   });
 
-  rightText2 = new Text({
+  rowText2 = new Text({
     text: '4',
     font: '20px Arial',
     color: 'black',
@@ -91,7 +91,7 @@ export default class GameArea {
     y: 104,
   });
 
-  rightText3 = new Text({
+  rowText3 = new Text({
     text: '6',
     font: '20px Arial',
     color: 'black',
@@ -99,7 +99,7 @@ export default class GameArea {
     y: 168,
   });
 
-  rightText4 = new Text({
+  rowText4 = new Text({
     text: '2',
     font: '20px Arial',
     color: 'black',
@@ -107,7 +107,7 @@ export default class GameArea {
     y: 232,
   });
 
-  rightText5 = new Text({
+  rowText5 = new Text({
     text: '9',
     font: '20px Arial',
     color: 'black',
@@ -115,7 +115,7 @@ export default class GameArea {
     y: 296,
   });
 
-  rightText6 = new Text({
+  rowText6 = new Text({
     text: '7',
     font: '20px Arial',
     color: 'black',
@@ -123,7 +123,7 @@ export default class GameArea {
     y: 360,
   });
 
-  rightText7 = new Text({
+  rowText7 = new Text({
     text: '5',
     font: '20px Arial',
     color: 'black',
@@ -165,10 +165,6 @@ export default class GameArea {
     }
   });
 
-
-
- 
-
   update(dt) {
 
   }
@@ -176,21 +172,21 @@ export default class GameArea {
   render() {
     this.background.render();
 
-    this.scoreText.render();
-    this.scoreText2.render();
-    this.scoreText3.render();
-    this.scoreText4.render();
-    this.scoreText5.render();
-    this.scoreText6.render();
-    this.scoreText7.render();
-    this.scoreText8.render();
+    this.columnText.render();
+    this.columnText2.render();
+    this.columnText3.render();
+    this.columnText4.render();
+    this.columnText5.render();
+    this.columnText6.render();
+    this.columnText7.render();
+    this.columnText8.render();
 
-    this.rightText1.render();
-    this.rightText2.render();
-    this.rightText3.render();
-    this.rightText4.render();
-    this.rightText5.render();
-    this.rightText6.render();
-    this.rightText7.render();
+    this.rowText1.render();
+    this.rowText2.render();
+    this.rowText3.render();
+    this.rowText4.render();
+    this.rowText5.render();
+    this.rowText6.render();
+    this.rowText7.render();
   }
 }
