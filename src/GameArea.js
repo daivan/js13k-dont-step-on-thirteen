@@ -1,169 +1,101 @@
 import { GameObjectClass, Sprite, Text } from 'kontra';
+import generateStars from './SkyGenerator';
 
 export default class GameArea {
 
-  numbersInRows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  constructor(sprite) {
+    this.sprite = sprite;
+    this.columnTexts = []
+    this.numberOfColumns = 8;
+    this.horizontalNumbers = [];
+    this.verticalNumbers = [];
+    this.populateNumbers();
+    this.horizontalTexts = [];
+    this.verticalTexts = [];
+    this.updateNumberTexts();
+    this.grid = this.createGrid(sprite);
+    this.background = this.createBackground();
+  }
 
-  numberOfRows = 10;
-  numberOfColumns = 8;
+  //create a method for populating random numbers in the rows and columns
+  populateNumbers() {
+    for (let i = 0; i < this.numberOfColumns; i++) {
+      //push random integers between 1 and 9 into the horizontalNumbers array
+      this.horizontalNumbers.push(Math.floor(Math.random() * 9) + 1);
+      //push random integers between 1 and 9 into the verticalNumbers array
+      this.verticalNumbers.push(Math.floor(Math.random() * 9) + 1);
+    }
+  }
 
+  //create a method for updating the numbers in the rows and columns
+  updateNumberTexts() {
+    for (let i = 0; i < this.numberOfColumns; i++) {
+      const squareSize = 64;
+      const fontOffset = 5;
+      this.horizontalTexts.push(new Text({
+        text: this.horizontalNumbers[i].toString(),
+        font: '20px Arial',
+        color: 'white',
+        x: i * 64 + squareSize / 2 - fontOffset + squareSize,
+        y: squareSize / 2 - fontOffset * 2,
+      }));
 
-  columnText = new Text({
-    text: '7',
-    font: '20px Arial',
-    color: 'black',
-    x: 0,
-    y: 0,
+      this.verticalTexts.push(new Text({
+        text: this.verticalNumbers[i].toString(),
+        font: '20px Arial',
+        color: 'white',
+        x: squareSize / 2 - fontOffset,
+        y: i * 64 + squareSize / 2 - fontOffset * 2 + 64,
+      }));
+    }
+  }
 
-  });
+  //create a method for creating the grid
+  createGrid(image) {
+    return Sprite({
+      x: 0,
+      y: 0,
+      image: image,
+      // required for an image sprite
+      render: function () {
+        const tileSize = 64; // Size of each tile
+        const numRows = 8;
+        const numCols = 8;
 
-  columnText2 = new Text({
-    text: '6',
-    font: '20px Arial',
-    color: 'black',
-    x: 64,
-    y: 0,
+        // Define different tile colors
+        const colors = ['#e78ea799', '#000000'];
 
-  });
-
-  columnText3 = new Text({
-    text: '2',
-    font: '20px Arial',
-    color: 'black',
-    x: 128,
-    y: 0,
-
-  });
-  columnText4 = new Text({
-    text: '4',
-    font: '20px Arial',
-    color: 'black',
-    x: 196,
-    y: 0,
-
-  });
-  columnText5 = new Text({
-    text: '6',
-    font: '20px Arial',
-    color: 'black',
-    x: 256,
-    y: 0,
-
-  });
-  columnText6 = new Text({
-    text: '4',
-    font: '20px Arial',
-    color: 'black',
-    x: 320,
-    y: 0,
-  });
-  columnText7 = new Text({
-    text: '10',
-    font: '20px Arial',
-    color: 'black',
-    x: 384,
-    y: 0,
-
-  });
-
-  columnText8 = new Text({
-    text: '3',
-    font: '20px Arial',
-    color: 'black',
-    x: 448,
-    y: 0,
-
-  });
-
-  rowText1 = new Text({
-    text: '5',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 40,
-  });
-
-  rowText2 = new Text({
-    text: '4',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 104,
-  });
-
-  rowText3 = new Text({
-    text: '6',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 168,
-  });
-
-  rowText4 = new Text({
-    text: '2',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 232,
-  });
-
-  rowText5 = new Text({
-    text: '9',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 296,
-  });
-
-  rowText6 = new Text({
-    text: '7',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 360,
-  });
-
-  rowText7 = new Text({
-    text: '5',
-    font: '20px Arial',
-    color: 'black',
-    x: 490,
-    y: 424,
-  });
-
-  background = Sprite({
-    x: 0,
-    y: 0,
-    // required for an image sprite
-    render: function() {
-      const tileSize = 64; // Size of each tile
-      //const numRows = canvas.height / tileSize;
-      //const numCols = canvas.width / tileSize;
-  
-      const numRows = 7;
-      const numCols = 8;
-
-      // Define different tile colors
-      const colors = ['#EAEAEA', '#D3D3D3'];
-  
-      // Loop through rows and columns to draw tiles
-      for (let row = 0; row < numRows; row++) {
+        // Loop through rows and columns to draw tiles
+        for (let row = 0; row < numRows; row++) {
           for (let col = 0; col < numCols; col++) {
-              // Calculate the x and y position of the tile
-              const x = col * tileSize;
-              const y = row * tileSize;
-  
-              // Determine the color of the tile based on row and column
-              const colorIndex = (row + col) % colors.length;
+            // Calculate the x and y position of the tile
+            const x = col * tileSize;
+            const y = row * tileSize;
+
+            // Determine the color of the tile based on row and column
+            const colorIndex = (row + col) % colors.length;
+            if (colorIndex == 0) {
               const tileColor = colors[colorIndex];
-  
+
               // Draw the tile
               this.context.fillStyle = tileColor;
               this.context.fillRect(x, y, tileSize, tileSize);
+              //draw the image
+              this.context.drawImage(this.image, x, y, tileSize, tileSize);
+            }
           }
+        }
       }
-    }
-  });
+    });
+  }
+
+  createBackground() {
+    return Sprite({
+      x: 0,
+      y: 0,
+      image: generateStars(500)
+    });
+  }
 
   update(dt) {
 
@@ -171,22 +103,9 @@ export default class GameArea {
 
   render() {
     this.background.render();
+    this.grid.render();
+    this.horizontalTexts.forEach(text => text.render());
+    this.verticalTexts.forEach(text => text.render());
 
-    this.columnText.render();
-    this.columnText2.render();
-    this.columnText3.render();
-    this.columnText4.render();
-    this.columnText5.render();
-    this.columnText6.render();
-    this.columnText7.render();
-    this.columnText8.render();
-
-    this.rowText1.render();
-    this.rowText2.render();
-    this.rowText3.render();
-    this.rowText4.render();
-    this.rowText5.render();
-    this.rowText6.render();
-    this.rowText7.render();
   }
 }
