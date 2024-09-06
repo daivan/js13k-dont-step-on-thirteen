@@ -41,6 +41,11 @@ export default class GameArea {
       //push random integers between 1 and 9 into the verticalNumbers array
       this.verticalNumbers.push(Math.floor(Math.random() * 9) + 1);
     }
+    if (this.horizontalNumbers[3] + this.verticalNumbers[3] === 13) {
+      this.horizontalNumbers = [];
+      this.verticalNumbers = [];
+      this.populateNumbers();
+    }
   }
 
   updateNumbers() {
@@ -111,24 +116,41 @@ export default class GameArea {
       ],
       greenColor: '#41772f',
       redColor: '#ae3b2f',
+      tileSize: 64,
+      numRows: 8,
+      green: '#41772f',
+      red: '#ae3b2f',
+      drawCanon: function (x, y, red = false, rotated = false) {
+        if (!rotated) {
+          if (x !== 8 * this.tileSize) {
+            const tileColor = red ? this.red : this.green;
+            this.context.fillStyle = tileColor;
+            this.context.fillRect(x + 20, y + 8, 26, 13);
+          }
+          this.context.drawImage(this.image, this.tileSize, 0, this.tileSize, this.tileSize, x, y, this.tileSize, this.tileSize);
+        }
+        if (rotated) {
+          if (y !== 8 * this.tileSize) {
+            const tileColor = red ? this.red : this.green;
+            this.context.fillStyle = tileColor;
+            this.context.fillRect(x + 8, y + 20, 13, 26);
+          }
+          this.context.save();
+          this.context.translate(x, y + this.tileSize);
+          this.context.rotate(-Math.PI / 2);
+          this.context.drawImage(this.image, this.tileSize, 0, this.tileSize, this.tileSize, 0, 0, this.tileSize, this.tileSize);
+          this.context.restore();
+        }
+      },
 
       // required for an image sprite
       render: function () {
-        const tileSize = 64; // Size of each tile
-        const numRows = 8;
-        const numCols = 8;
-        const green = '#41772f';
-        const red = '#ae3b2f';
-
-        // Define different tile colors
-        const colors = ['#e78ea799'];
-
         // Loop through rows and columns to draw tiles
-        for (let row = 0; row < numRows; row++) {
-          for (let col = 0; col < numCols; col++) {
+        for (let row = 0; row < this.numRows; row++) {
+          for (let col = 0; col < this.numRows; col++) {
             // Calculate the x and y position of the tile
-            const x = col * tileSize;
-            const y = row * tileSize;
+            const x = col * this.tileSize;
+            const y = row * this.tileSize;
 
             // Determine the color of the tile based on row and column
             const colorIndex = (row + col) % 2;
@@ -136,28 +158,19 @@ export default class GameArea {
               const tileColor = this.levelColors[currentLevel() - 1];
               // Draw the tile
               this.context.fillStyle = tileColor;
-              this.context.fillRect(x, y, tileSize, tileSize);
-              this.context.drawImage(this.image, 0, 0, tileSize, tileSize, x, y, tileSize, tileSize);
+              this.context.fillRect(x, y, this.tileSize, this.tileSize);
+              this.context.drawImage(this.image, 0, 0, this.tileSize, this.tileSize, x, y, this.tileSize, this.tileSize);
             }
             if (row == 0 && col != 0) {
-              const tileColor = colsWith13Sums().includes(col - 1) ? red : green;
-              // Draw the tile
-              this.context.fillStyle = tileColor;
-              this.context.fillRect(x + 20, y + 8, 26, 13);
-              this.context.drawImage(this.image, tileSize, 0, tileSize, tileSize, x, y, tileSize, tileSize);
+              this.drawCanon(x, y, colsWith13Sums().includes(col - 1));
             }
             if (col == 0 && row != 0) {
-              const tileColor = rowsWith13Sums().includes(row - 1) ? red : green;
-              this.context.fillStyle = tileColor;
-              this.context.fillRect(x + 8, y + 20, 13, 26);
-              this.context.save();
-              this.context.translate(x, y + tileSize);
-              this.context.rotate(-Math.PI / 2);
-              this.context.drawImage(this.image, tileSize, 0, tileSize, tileSize, 0, 0, tileSize, tileSize);
-              this.context.restore();
+              this.drawCanon(x, y, colsWith13Sums().includes(row - 1), true);
             }
           }
         }
+        this.drawCanon(0, 8 * this.tileSize, false, true);
+        this.drawCanon(8 * this.tileSize, 0, false, false);
       },
       update: function (dt) {
         //updateNumbers every 5 seconds
