@@ -15,7 +15,10 @@ export default class GameArea {
     this.updateNumberTexts();
     this.colsWith13Sums = [];
     this.rowsWith13Sums = [];
+    this.tilesWith13Sums = [];
+    this.warningTiles = [];
     this.populateColsAndRowsWith13Sums();
+    this.populateWarningTiles();
     this.grid = this.createGrid(sprite, this.getColsWith13Sums.bind(this), this.getRowsWith13Sums.bind(this), this.updateNumbers.bind(this), this.getCurrentLevel.bind(this));
     this.background = this.createBackground();
     this.level = 1;
@@ -56,19 +59,50 @@ export default class GameArea {
     this.verticalNumbers.push(Math.floor(Math.random() * 9) + 1);
     this.updateNumberTexts();
     this.populateColsAndRowsWith13Sums();
+    this.populateWarningTiles();
   }
 
   populateColsAndRowsWith13Sums() {
     this.colsWith13Sums = [];
     this.rowsWith13Sums = [];
-    for (let i = 0; i < this.numberOfColumns; i++) {
-      for (let j = 0; j < this.numberOfColumns; j++) {
+    this.tilesWith13Sums = [];
+    let count = 0;
+    for (let i = 0; i < this.numberOfColumns - 1; i++) {
+      for (let j = 0; j < this.numberOfColumns - 1; j++) {
+        count++;
         if (this.horizontalNumbers[i] + this.verticalNumbers[j] === 13) {
           this.colsWith13Sums.push(i);
           this.rowsWith13Sums.push(j);
+          this.tilesWith13Sums.push({ x: i, y: j });
         }
       }
     }
+  }
+
+  populateWarningTiles() {
+    this.warningTiles = [];
+    this.tilesWith13Sums.forEach(tile => {
+      this.warningTiles.push(Sprite({
+        x: tile.x * 64 + 64,
+        y: tile.y * 64 + 64,
+        color: '#ae3b2f',
+        alpha: 255,
+        width: 64,
+        height: 64,
+        render: function () {
+          const color = `${this.color}${this.alpha.toString(16).padStart(2, '0')}`;
+          this.context.fillStyle = color;
+          this.context.fillRect(0, 0, this.width, this.height);
+        },
+        update: function (dt) {
+          this.alpha = this.alpha - Math.floor(dt * 300);
+          if (this.alpha < 0) {
+            this.alpha = 0;
+          }
+        }
+      }));
+
+    });
   }
 
   //create a method for updating the numbers in the rows and columns
@@ -162,7 +196,7 @@ export default class GameArea {
               this.context.drawImage(this.image, 0, 0, this.tileSize, this.tileSize, x, y, this.tileSize, this.tileSize);
             }
             if (row == 0 && col != 0) {
-              this.drawCanon(x, y, colsWith13Sums().includes(col - 1));
+              this.drawCanon(x, y, rowsWith13Sums().includes(col - 1));
             }
             if (col == 0 && row != 0) {
               this.drawCanon(x, y, colsWith13Sums().includes(row - 1), true);
@@ -194,13 +228,14 @@ export default class GameArea {
 
   update(dt) {
     this.grid.update(dt);
+    this.warningTiles.forEach(tile => tile.update(dt));
   }
 
   render() {
     this.background.render();
     this.grid.render();
+    this.warningTiles.forEach(tile => tile.render());
     this.horizontalTexts.forEach(text => text.render());
     this.verticalTexts.forEach(text => text.render());
-
   }
 }
