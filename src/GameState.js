@@ -1,6 +1,5 @@
 import { GameObjectClass, Sprite, Text, initKeys, keyPressed, collides } from 'kontra';
 
-
 initKeys();
 
 export default class GameState extends GameObjectClass {
@@ -15,6 +14,8 @@ export default class GameState extends GameObjectClass {
     this.gameOver = false;
     this.gameObjects = [];
 
+    this.scene = 'START';
+    
 
     this.goalSprite = Sprite({
       x: Math.floor(Math.random() * 7) * 64 + 64,
@@ -99,6 +100,15 @@ export default class GameState extends GameObjectClass {
         }
       }
     });
+  }
+
+  startGame() {
+    this.scene = 'GAME';
+    this.playerSprite.x = 100;
+    this.playerSprite.y = 100;
+    this.gameOver = false;
+    this.score = 0;
+    this.level = 1;
   }
 
   createLasers() {
@@ -211,6 +221,7 @@ export default class GameState extends GameObjectClass {
   }
 
   update(dt) {
+    
     if (this.score === this.level * 5) {
       this.level = this.level + 1;
       if (this.level > this.maxLevel) {
@@ -226,6 +237,7 @@ export default class GameState extends GameObjectClass {
       }
     });
     if (this.gameOver) {
+      this.scene = 'GAME_OVER';
       return;
     }
     this.playerSprite.update();
@@ -243,6 +255,7 @@ export default class GameState extends GameObjectClass {
     this.goalSprite.render();
     this.gameObjects.forEach(laser => laser.render());
     if (this.gameOver) {
+      this.scene = 'GAME_OVER';
       return;
     }
     this.playerSprite.render();
