@@ -95,7 +95,7 @@ export default class GameArea {
           this.context.fillRect(0, 0, this.width, this.height);
         },
         update: function (dt) {
-          this.alpha = this.alpha - Math.floor(dt * 300);
+          this.alpha = this.alpha - Math.floor(dt * 200);
           if (this.alpha < 0) {
             this.alpha = 0;
           }
@@ -196,10 +196,10 @@ export default class GameArea {
               this.context.drawImage(this.image, 0, 0, this.tileSize, this.tileSize, x, y, this.tileSize, this.tileSize);
             }
             if (row == 0 && col != 0) {
-              this.drawCanon(x, y, rowsWith13Sums().includes(col - 1));
+              this.drawCanon(x, y, colsWith13Sums().includes(col - 1));
             }
             if (col == 0 && row != 0) {
-              this.drawCanon(x, y, colsWith13Sums().includes(row - 1), true);
+              this.drawCanon(x, y, rowsWith13Sums().includes(row - 1), true);
             }
           }
         }
