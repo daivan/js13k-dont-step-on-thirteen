@@ -9,13 +9,14 @@ let { canvas, context } = init();
 canvas.width = 64 * 9;
 canvas.height = 64 * 9;
 
-const sprites = await load('sprites2.png', 'square.png');
+const sprites = await load('square.png');
 
-let gameArea = new GameArea(sprites[1]);
+let gameArea = new GameArea(sprites[0]);
 let gameState = new GameState(sprites[0], gameArea);
 
 let loop = GameLoop({  // create the main game loop
   update: function (dt) { // update the game state
+    gameState.gameArea.update(dt)
     gameState.update(dt)
   },
   render: function () { // render the game state
