@@ -1,6 +1,7 @@
-import { GameObjectClass, Sprite, Text, initKeys, keyPressed, collides } from 'kontra';
+import { GameObjectClass, Sprite, Text, initKeys, initGamepad, keyPressed, gamepadPressed, gamepadAxis, collides } from 'kontra';
 
 initKeys();
+initGamepad();
 
 export default class GameState extends GameObjectClass {
 
@@ -37,6 +38,28 @@ export default class GameState extends GameObjectClass {
       }
     });
 
+    this.energyBar = Sprite({
+      x: 64 * 6 + 28,
+      y: 64 * 8 + 32,
+      width: 96,
+      height: 32,
+      customRender(energy) {
+        this.context.fillStyle = 'white';
+        this.context.fillRect(this.x - 32, this.y - this.height / 2, this.width + 36, this.height + 4);
+        this.context.fillStyle = 'black';
+        this.context.fillRect(this.x + 2, this.y - this.height / 2 + 2, this.width, this.height);
+        this.context.fillStyle = '#4a8cbd';
+        this.context.fillRect(this.x + 2, this.y - this.height / 2 + 2, this.width * energy / 100, this.height);
+        this.context.fillStyle = 'black';
+        this.context.font = 'bold 20px Arial';
+        this.context.fillText('E', this.x - 22, this.y + 10);
+
+
+
+
+      }
+    });
+
     this.playerSprite = Sprite({
       x: 5 * 64 - 32,
       y: 5 * 64 - 32,
@@ -47,32 +70,62 @@ export default class GameState extends GameObjectClass {
       size: 64,
       rotation: 0,
       customImage: this.sprite,
+      turbo: false,
+      energy: 100,
+      cooldown: 0,
+      toggleTurbo() {
+        if (this.cooldown === 0) {
+          this.turbo = !this.turbo;
+          this.cooldown = 30;
+        }
+      },
+      updateEnergy() {
+        if (this.turbo) {
+          this.energy -= 1;
+          if (this.energy <= 0) {
+            this.toggleTurbo();
+          }
+        } else {
+          this.energy += 0.5;
+          if (this.energy > 100) {
+            this.energy = 100;
+          }
+        }
+      },
+      getSpeed() {
+        return this.turbo ? this.speed * 2 : this.speed;
+      },
       render() {
         this.context.drawImage(this.customImage, 128, 0, this.size, this.size, -this.size / 2, -this.size / 2, this.size, this.size);
       },
       update(dt, gameState) {
-
+        let axisX = gamepadAxis('leftstickx', 0);
+        let axisY = gamepadAxis('leftsticky', 0);
         this.direction.x = 0;
         this.direction.y = 0;
 
-        if (keyPressed('w')) {
+        if (keyPressed('w') || keyPressed('arrowup') || gamepadPressed('dpadup') || axisY < -0.5) {
           this.direction.y = -1;
         }
 
-        if (keyPressed('s')) {
+        if (keyPressed('s') || keyPressed('arrowdown') || gamepadPressed('dpaddown') || axisY > 0.5) {
           this.direction.y = 1;
         }
 
-        if (keyPressed('a')) {
+        if (keyPressed('a') || keyPressed('arrowleft') || gamepadPressed('dpadleft') || axisX < -0.5) {
           this.direction.x = -1;
         }
 
-        if (keyPressed('d')) {
+        if (keyPressed('d') || keyPressed('arrowright') || gamepadPressed('dpadright') || axisX > 0.5) {
           this.direction.x = 1;
         }
 
-        this.velocity.x = this.direction.x * this.speed;
-        this.velocity.y = this.direction.y * this.speed;
+        if (keyPressed('space') || gamepadPressed('south')) {
+          this.toggleTurbo();
+        }
+
+        this.velocity.x = this.direction.x * this.getSpeed();
+        this.velocity.y = this.direction.y * this.getSpeed();
 
         if (this.velocity.x !== 0 && this.velocity.y !== 0) {
           this.velocity.x /= Math.sqrt(2);
@@ -97,6 +150,11 @@ export default class GameState extends GameObjectClass {
 
         if (this.direction.x !== 0 || this.direction.y !== 0) {
           this.rotation = Math.atan2(this.direction.y, this.direction.x) + Math.PI / 2;
+        }
+
+        this.updateEnergy();
+        if (this.cooldown > 0) {
+          this.cooldown -= 1;
         }
       }
     });
@@ -259,5 +317,6 @@ export default class GameState extends GameObjectClass {
       return;
     }
     this.playerSprite.render();
+    this.energyBar.customRender(this.playerSprite.energy);
   }
 }
