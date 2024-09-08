@@ -1,6 +1,7 @@
-import { GameObjectClass, Sprite, Text, initKeys, keyPressed, collides } from 'kontra';
+import { GameObjectClass, Sprite, Text, initKeys, initGamepad, keyPressed, gamepadPressed, gamepadAxis, collides } from 'kontra';
 
 initKeys();
+initGamepad();
 
 export default class GameState extends GameObjectClass {
 
@@ -51,23 +52,24 @@ export default class GameState extends GameObjectClass {
         this.context.drawImage(this.customImage, 128, 0, this.size, this.size, -this.size / 2, -this.size / 2, this.size, this.size);
       },
       update(dt, gameState) {
-
+        let axisX = gamepadAxis('leftstickx', 0);
+        let axisY = gamepadAxis('leftsticky', 0);
         this.direction.x = 0;
         this.direction.y = 0;
 
-        if (keyPressed('w')) {
+        if (keyPressed('w') || keyPressed('arrowup') || gamepadPressed('dpadup') || axisY < -0.5) {
           this.direction.y = -1;
         }
 
-        if (keyPressed('s')) {
+        if (keyPressed('s') || keyPressed('arrowdown') || gamepadPressed('dpaddown') || axisY > 0.5) {
           this.direction.y = 1;
         }
 
-        if (keyPressed('a')) {
+        if (keyPressed('a') || keyPressed('arrowleft') || gamepadPressed('dpadleft') || axisX < -0.5) {
           this.direction.x = -1;
         }
 
-        if (keyPressed('d')) {
+        if (keyPressed('d') || keyPressed('arrowright') || gamepadPressed('dpadright') || axisX > 0.5) {
           this.direction.x = 1;
         }
 
