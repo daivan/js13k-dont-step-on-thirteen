@@ -9,7 +9,7 @@ export default class GameState extends GameObjectClass {
     super(properties)
     this.sprite = sprite;
     this.gameArea = gameArea;
-    this.score = 0;
+    this.score = 100;
     this.level = 1;
     this.maxLevel = 7;
     this.gameOver = false;

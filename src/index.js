@@ -24,7 +24,7 @@ let loop = GameLoop({  // create the main game loop
       startScene.update();
       return;
     } else if (gameState.scene == 'GAME_OVER') {
-      gameOverScene.update();
+      gameOverScene.update(dt, gameState.score);
       return;
     }
     gameState.gameArea.update(dt)
