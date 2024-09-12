@@ -1,5 +1,6 @@
 import { GameObjectClass, Sprite, Text } from 'kontra';
 import generateStars from './SkyGenerator';
+import play from './Audio';
 
 export default class GameArea {
 
@@ -7,6 +8,7 @@ export default class GameArea {
     this.sprite = sprite;
     this.columnTexts = []
     this.numberOfColumns = 8;
+    this.level = 1;
     this.horizontalNumbers = [];
     this.verticalNumbers = [];
     this.populateNumbers();
@@ -19,9 +21,22 @@ export default class GameArea {
     this.warningTiles = [];
     this.populateColsAndRowsWith13Sums();
     this.populateWarningTiles();
-    this.grid = this.createGrid(sprite, this.getColsWith13Sums.bind(this), this.getRowsWith13Sums.bind(this), this.updateNumbers.bind(this), this.getCurrentLevel.bind(this));
+    // this.grid = this.createGrid(sprite, this.getColsWith13Sums.bind(this), this.getRowsWith13Sums.bind(this), this.updateNumbers.bind(this), this.getCurrentLevel.bind(this));
+    this.grid = this.resetGrid();
     this.background = this.createBackground();
-    this.level = 1;
+  }
+
+  startLevel() {
+    this.populateNumbers();
+    this.updateNumberTexts();
+    this.populateColsAndRowsWith13Sums();
+    this.populateWarningTiles();
+    this.resetGrid();
+  }
+
+  resetGrid() {
+    console.log(this.getCurrentLevel());
+    return this.createGrid(this.sprite, this.getColsWith13Sums.bind(this), this.getRowsWith13Sums.bind(this), this.updateNumbers.bind(this), this.getCurrentLevel.bind(this));
   }
 
   getCurrentLevel() {
@@ -60,6 +75,7 @@ export default class GameArea {
     this.updateNumberTexts();
     this.populateColsAndRowsWith13Sums();
     this.populateWarningTiles();
+    play('update');
   }
 
   populateColsAndRowsWith13Sums() {
@@ -137,7 +153,6 @@ export default class GameArea {
       x: 0,
       y: 0,
       image: image,
-      level: 1,
       levelColors: [
         '#e78ea799',
         '#e38a3a99',

@@ -3,19 +3,19 @@ import { GameObjectClass, Sprite, Text, initKeys, keyPressed, collides } from 'k
 
 initKeys();
 
-  export default class StartPage extends GameObjectClass {
+export default class StartPage extends GameObjectClass {
 
   constructor(gameState, properties) {
     super(properties)
-    
+
     this.gameState = gameState;
 
     this.title = new Text({
       text: 'You died',
       font: '20px Arial',
       color: 'white',
-      x: 20,
-      y: 40,
+      x: 60 * 3,
+      y: 60 * 3,
     });
 
     this.scoreText = new Text({
@@ -23,9 +23,9 @@ initKeys();
       text: 'Total score: ' + this.score,
       font: '20px Arial',
       color: 'white',
-      x: 20,
-      y: 60,
-      update: function() {
+      x: 60 * 3,
+      y: 60 * 3.5,
+      update: function () {
         this.text = 'Total score: ' + this.score;
       }
     });
@@ -34,8 +34,8 @@ initKeys();
       text: 'Press [Enter] to try again',
       font: '20px Arial',
       color: 'white',
-      x: 20,
-      y: 100,
+      x: 60 * 3,
+      y: 60 * 4,
     });
   }
 
