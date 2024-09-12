@@ -1,4 +1,5 @@
 import { GameObjectClass, Sprite, Text, initKeys, initGamepad, keyPressed, gamepadPressed, gamepadAxis, collides } from 'kontra';
+import play from './Audio';
 
 initKeys();
 initGamepad();
@@ -16,7 +17,7 @@ export default class GameState extends GameObjectClass {
     this.gameObjects = [];
 
     this.scene = 'START';
-    
+
 
     this.goalSprite = Sprite({
       x: Math.floor(Math.random() * 7) * 64 + 64,
@@ -53,10 +54,6 @@ export default class GameState extends GameObjectClass {
         this.context.fillStyle = 'black';
         this.context.font = 'bold 20px Arial';
         this.context.fillText('E', this.x - 22, this.y + 10);
-
-
-
-
       }
     });
 
@@ -73,6 +70,7 @@ export default class GameState extends GameObjectClass {
       turbo: false,
       energy: 100,
       cooldown: 0,
+      dead: false,
       toggleTurbo() {
         if (this.cooldown === 0) {
           this.turbo = !this.turbo;
@@ -94,6 +92,9 @@ export default class GameState extends GameObjectClass {
       },
       getSpeed() {
         return this.turbo ? this.speed * 2 : this.speed;
+      },
+      remove() {
+        this.ttl = 0;
       },
       render() {
         this.context.drawImage(this.customImage, 128, 0, this.size, this.size, -this.size / 2, -this.size / 2, this.size, this.size);
@@ -158,15 +159,23 @@ export default class GameState extends GameObjectClass {
         }
       }
     });
+
+    this.gameObjects.push(this.playerSprite);
+
   }
 
+
   startGame() {
-    this.scene = 'GAME';
-    this.playerSprite.x = 100;
-    this.playerSprite.y = 100;
+    this.level = 1;
+    this.gameArea.level = this.level;
+    this.gameArea.startLevel();
+    this.gameObjects = [];
+    this.playerSprite.x = 64 * 4.5;
+    this.playerSprite.y = 64 * 4.5;
+    this.playerSprite.dead = false;
     this.gameOver = false;
     this.score = 0;
-    this.level = 1;
+    this.scene = 'GAME';
   }
 
   createLasers() {
@@ -216,6 +225,7 @@ export default class GameState extends GameObjectClass {
 
   createExplosion() {
     let particles = [];
+    self = this;
 
     for (let i = 0; i < 20; i++) {
       particles.push({
@@ -251,6 +261,7 @@ export default class GameState extends GameObjectClass {
 
         if (this.particles.length === 0) {
           this.ttl = 0; // "Time to live", döda spriten när partiklarna är borta
+          self.gameOver = true;
         }
       },
 
@@ -273,13 +284,15 @@ export default class GameState extends GameObjectClass {
     const summary = this.gameArea.verticalNumbers[this.rowNumber] + this.gameArea.horizontalNumbers[this.columnNumber];
     if (summary === 13) {
       this.createLasers();
-      this.gameOver = true;
+      this.playerSprite.dead = true;
       this.createExplosion();
+      play('explosion');
+
     }
   }
 
   update(dt) {
-    
+
     if (this.score === this.level * 5) {
       this.level = this.level + 1;
       if (this.level > this.maxLevel) {
@@ -287,6 +300,11 @@ export default class GameState extends GameObjectClass {
         this.gameOver = true;
       }
       this.gameArea.level = this.level;
+      play('levelup', 0.3);
+    }
+    if (this.gameOver) {
+      this.scene = 'GAME_OVER';
+      return;
     }
     this.gameObjects.forEach((object, index) => {
       object.update(dt);
@@ -294,29 +312,30 @@ export default class GameState extends GameObjectClass {
         this.gameObjects.splice(index, 1);
       }
     });
-    if (this.gameOver) {
-      this.scene = 'GAME_OVER';
-      return;
+    if (!this.playerSprite.dead) {
+      this.playerSprite.update();
+      this.updateNumbers();
     }
-    this.playerSprite.update();
-    this.updateNumbers();
 
     var collide = collides(this.playerSprite, this.goalSprite);
     if (collide) {
       this.score = this.score + 1;
       this.goalSprite.x = Math.floor(Math.random() * 7) * 64 + 64;
       this.goalSprite.y = Math.floor(Math.random() * 7) * 64 + 64;
+      play('pickup', 0.2);
     }
   }
 
   render() {
     this.goalSprite.render();
-    this.gameObjects.forEach(laser => laser.render());
     if (this.gameOver) {
       this.scene = 'GAME_OVER';
       return;
     }
-    this.playerSprite.render();
+    this.gameObjects.forEach(laser => laser.render());
+    if (!this.playerSprite.dead) {
+      this.playerSprite.render();
+    }
     this.energyBar.customRender(this.playerSprite.energy);
   }
 }
