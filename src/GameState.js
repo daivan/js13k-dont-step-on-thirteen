@@ -1,8 +1,9 @@
-import { GameObjectClass, Sprite, Text, initKeys, initGamepad, keyPressed, gamepadPressed, gamepadAxis, collides } from 'kontra';
+import { GameObjectClass, Sprite, Text, initKeys, initGamepad, keyPressed, gamepadPressed, gamepadAxis, collides, keyMap } from 'kontra';
 import play from './Audio';
 
 initKeys();
 initGamepad();
+keyMap['ControlLeft'] = 'ctrl';
 
 export default class GameState extends GameObjectClass {
 
@@ -71,17 +72,31 @@ export default class GameState extends GameObjectClass {
       energy: 100,
       cooldown: 0,
       dead: false,
+      stealthed: false,
       toggleTurbo() {
-        if (this.cooldown === 0) {
+        if (this.cooldown === 0 && this.energy > 0 && !this.stealthed) {
           this.turbo = !this.turbo;
           this.cooldown = 30;
         }
+      },
+      resetPlayer() {
+        this.x = 5 * 64 - 32;
+        this.y = 5 * 64 - 32;
+        this.dead = false;
+        this.energy = 100;
+        this.turbo = false;
+        this.rotation = 0;
       },
       updateEnergy() {
         if (this.turbo) {
           this.energy -= 1;
           if (this.energy <= 0) {
-            this.toggleTurbo();
+            this.turbo = false;
+          }
+        } else if (this.stealthed) {
+          this.energy -= 1.5;
+          if (this.energy <= 0) {
+            this.stealthed = false;
           }
         } else {
           this.energy += 0.5;
@@ -97,6 +112,9 @@ export default class GameState extends GameObjectClass {
         this.ttl = 0;
       },
       render() {
+        if (this.stealthed) {
+          this.context.globalAlpha = 0.5;
+        }
         this.context.drawImage(this.customImage, 128, 0, this.size, this.size, -this.size / 2, -this.size / 2, this.size, this.size);
       },
       update(dt, gameState) {
@@ -123,6 +141,12 @@ export default class GameState extends GameObjectClass {
 
         if (keyPressed('space') || gamepadPressed('south')) {
           this.toggleTurbo();
+        }
+
+        if (keyPressed('ctrl') || gamepadPressed('west')) {
+          if (this.energy > 0 && !this.turbo) {
+            this.stealthed = true;
+          }
         }
 
         this.velocity.x = this.direction.x * this.getSpeed();
@@ -170,9 +194,7 @@ export default class GameState extends GameObjectClass {
     this.gameArea.level = this.level;
     this.gameArea.startLevel();
     this.gameObjects = [];
-    this.playerSprite.x = 64 * 4.5;
-    this.playerSprite.y = 64 * 4.5;
-    this.playerSprite.dead = false;
+    this.playerSprite.resetPlayer();
     this.gameOver = false;
     this.score = 0;
     this.scene = 'GAME';
@@ -282,7 +304,7 @@ export default class GameState extends GameObjectClass {
     this.rowNumber = Math.floor(this.playerSprite.y / 64) - 1;
     this.columnNumber = Math.floor(this.playerSprite.x / 64) - 1;
     const summary = this.gameArea.verticalNumbers[this.rowNumber] + this.gameArea.horizontalNumbers[this.columnNumber];
-    if (summary === 13) {
+    if (summary === 13 && !this.playerSprite.stealthed) {
       this.createLasers();
       this.playerSprite.dead = true;
       this.createExplosion();
@@ -295,10 +317,6 @@ export default class GameState extends GameObjectClass {
 
     if (this.score === this.level * 5) {
       this.level = this.level + 1;
-      if (this.level > this.maxLevel) {
-        this.level = this.maxLevel;
-        this.gameOver = true;
-      }
       this.gameArea.level = this.level;
       play('levelup', 0.3);
     }

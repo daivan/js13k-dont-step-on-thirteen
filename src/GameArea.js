@@ -9,6 +9,7 @@ export default class GameArea {
     this.columnTexts = []
     this.numberOfColumns = 8;
     this.level = 1;
+    this.levelSpeed = 1;
     this.horizontalNumbers = [];
     this.verticalNumbers = [];
     this.populateNumbers();
@@ -27,11 +28,17 @@ export default class GameArea {
   }
 
   startLevel() {
+    this.horizontalNumbers = [];
+    this.verticalNumbers = [];
     this.populateNumbers();
     this.updateNumberTexts();
     this.populateColsAndRowsWith13Sums();
     this.populateWarningTiles();
     this.resetGrid();
+  }
+
+  setLevelSpeed() {
+    this.levelSpeed = 1 + this.level / 2;
   }
 
   resetGrid() {
@@ -55,9 +62,11 @@ export default class GameArea {
   populateNumbers() {
     for (let i = 0; i < this.numberOfColumns; i++) {
       //push random integers between 1 and 9 into the horizontalNumbers array
-      this.horizontalNumbers.push(Math.floor(Math.random() * 9) + 1);
+      // this.horizontalNumbers.push(Math.floor(Math.random() * 9) + 1);
+      this.horizontalNumbers.push(i % 5 + 1);
       //push random integers between 1 and 9 into the verticalNumbers array
-      this.verticalNumbers.push(Math.floor(Math.random() * 9) + 1);
+      // this.verticalNumbers.push(Math.floor(Math.random() * 9) + 1);
+      this.verticalNumbers.push(i % 5 + 1);
     }
     if (this.horizontalNumbers[3] + this.verticalNumbers[3] === 13) {
       this.horizontalNumbers = [];
@@ -161,7 +170,6 @@ export default class GameArea {
         '#9fd7dd99',
         '#ffffff99',
         '#44444499'
-
       ],
       greenColor: '#41772f',
       redColor: '#ae3b2f',
@@ -169,6 +177,11 @@ export default class GameArea {
       numRows: 8,
       green: '#41772f',
       red: '#ae3b2f',
+      getLevelSpeed: function () {
+        const startIntervall = 2;
+        const updatedFactor = 0.1;
+        return startIntervall / (1 + (currentLevel() - 1) * updatedFactor);
+      },
       drawCanon: function (x, y, red = false, rotated = false) {
         if (!rotated) {
           if (x !== 8 * this.tileSize) {
@@ -204,7 +217,7 @@ export default class GameArea {
             // Determine the color of the tile based on row and column
             const colorIndex = (row + col) % 2;
             if (colorIndex == 0 && row != 0 && col != 0) {
-              const tileColor = this.levelColors[currentLevel() - 1];
+              const tileColor = this.levelColors[currentLevel() % this.levelColors.length];
               // Draw the tile
               this.context.fillStyle = tileColor;
               this.context.fillRect(x, y, this.tileSize, this.tileSize);
@@ -225,7 +238,7 @@ export default class GameArea {
         //updateNumbers every 5 seconds
         this.timeSinceLastUpdate = this.timeSinceLastUpdate || 0;
         this.timeSinceLastUpdate += dt;
-        if (this.timeSinceLastUpdate > 5 / currentLevel()) {
+        if (this.timeSinceLastUpdate > this.getLevelSpeed()) {
           updateNumbers();
           this.timeSinceLastUpdate = 0;
         }
