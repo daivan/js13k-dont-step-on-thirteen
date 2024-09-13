@@ -1,7 +1,8 @@
-import { GameObjectClass, Sprite, Text, initKeys, keyPressed, collides } from 'kontra';
+import { GameObjectClass, Sprite, Text, initKeys, keyPressed, initGamepad, gamepadPressed } from 'kontra';
 
 
 initKeys();
+initGamepad();
 
 export default class StartPage extends GameObjectClass {
 
@@ -19,7 +20,7 @@ export default class StartPage extends GameObjectClass {
     });
 
     this.subTitle = new Text({
-      text: 'Press [Enter] to start',
+      text: 'Press [Enter / Start] to start',
       font: '20px Arial',
       color: 'white',
       x: 64 * 3,
@@ -30,7 +31,7 @@ export default class StartPage extends GameObjectClass {
 
 
   update(dt) {
-    if (keyPressed('enter')) {
+    if (keyPressed('enter') || gamepadPressed('start')) {
       this.gameState.startGame();
     }
   }
