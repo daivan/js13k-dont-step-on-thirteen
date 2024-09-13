@@ -22,7 +22,6 @@ export default class GameArea {
     this.warningTiles = [];
     this.populateColsAndRowsWith13Sums();
     this.populateWarningTiles();
-    // this.grid = this.createGrid(sprite, this.getColsWith13Sums.bind(this), this.getRowsWith13Sums.bind(this), this.updateNumbers.bind(this), this.getCurrentLevel.bind(this));
     this.grid = this.resetGrid();
     this.background = this.createBackground();
   }
@@ -58,14 +57,9 @@ export default class GameArea {
     return this.rowsWith13Sums;
   }
 
-  //create a method for populating random numbers in the rows and columns
   populateNumbers() {
     for (let i = 0; i < this.numberOfColumns; i++) {
-      //push random integers between 1 and 9 into the horizontalNumbers array
-      // this.horizontalNumbers.push(Math.floor(Math.random() * 9) + 1);
       this.horizontalNumbers.push(i % 5 + 1);
-      //push random integers between 1 and 9 into the verticalNumbers array
-      // this.verticalNumbers.push(Math.floor(Math.random() * 9) + 1);
       this.verticalNumbers.push(i % 5 + 1);
     }
     if (this.horizontalNumbers[3] + this.verticalNumbers[3] === 13) {
@@ -76,7 +70,6 @@ export default class GameArea {
   }
 
   updateNumbers() {
-    //remove first element of horizontalNumbers and verticalNumbers and add a random number between 1 and 9 at the end of the array
     this.horizontalNumbers.shift();
     this.horizontalNumbers.push(Math.floor(Math.random() * 9) + 1);
     this.verticalNumbers.shift();
@@ -130,7 +123,6 @@ export default class GameArea {
     });
   }
 
-  //create a method for updating the numbers in the rows and columns
   updateNumberTexts() {
     this.horizontalTexts = [];
     this.verticalTexts = [];
@@ -156,7 +148,6 @@ export default class GameArea {
   }
 
 
-  //create a method for creating the grid
   createGrid(image, colsWith13Sums, rowsWith13Sums, updateNumbers, currentLevel) {
     return Sprite({
       x: 0,
@@ -177,6 +168,19 @@ export default class GameArea {
       numRows: 8,
       green: '#41772f',
       red: '#ae3b2f',
+      seed: 7,
+      seededRandom: function (seed) {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+      },
+      generateColor: function (seed, level) {
+        var r = Math.floor(this.seededRandom(seed + level) * 256);
+        var g = Math.floor(this.seededRandom(seed + level + 1) * 256);
+        var b = Math.floor(this.seededRandom(seed + level + 2) * 256);
+
+        var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        return `${hex}99`;
+      },
       getLevelSpeed: function () {
         const startIntervall = 2;
         const updatedFactor = 0.1;
@@ -205,20 +209,15 @@ export default class GameArea {
         }
       },
 
-      // required for an image sprite
       render: function () {
-        // Loop through rows and columns to draw tiles
         for (let row = 0; row < this.numRows; row++) {
           for (let col = 0; col < this.numRows; col++) {
-            // Calculate the x and y position of the tile
             const x = col * this.tileSize;
             const y = row * this.tileSize;
 
-            // Determine the color of the tile based on row and column
             const colorIndex = (row + col) % 2;
             if (colorIndex == 0 && row != 0 && col != 0) {
-              const tileColor = this.levelColors[currentLevel() % this.levelColors.length];
-              // Draw the tile
+              const tileColor = this.generateColor(this.seed, currentLevel());
               this.context.fillStyle = tileColor;
               this.context.fillRect(x, y, this.tileSize, this.tileSize);
               this.context.drawImage(this.image, 0, 0, this.tileSize, this.tileSize, x, y, this.tileSize, this.tileSize);
@@ -235,7 +234,6 @@ export default class GameArea {
         this.drawCanon(8 * this.tileSize, 0, false, false);
       },
       update: function (dt) {
-        //updateNumbers every 5 seconds
         this.timeSinceLastUpdate = this.timeSinceLastUpdate || 0;
         this.timeSinceLastUpdate += dt;
         if (this.timeSinceLastUpdate > this.getLevelSpeed()) {
