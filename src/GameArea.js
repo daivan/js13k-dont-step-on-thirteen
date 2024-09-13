@@ -153,17 +153,6 @@ export default class GameArea {
       x: 0,
       y: 0,
       image: image,
-      levelColors: [
-        '#e78ea799',
-        '#e38a3a99',
-        '#729d3f99',
-        '#aa4d8d99',
-        '#9fd7dd99',
-        '#ffffff99',
-        '#44444499'
-      ],
-      greenColor: '#41772f',
-      redColor: '#ae3b2f',
       tileSize: 64,
       numRows: 8,
       green: '#41772f',
